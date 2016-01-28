@@ -6,10 +6,9 @@ constexpr uint32_t kWindowWidth = kWidth * kPixelSize, kWindowHeight = kHeight *
 
 class Display : public sf::Drawable, public sf::Transformable {
 public:
-	void set_display(const std::bitset<kWidth*kHeight>& display) {
-		vertices.setPrimitiveType(sf::Quads);
-		vertices.resize(kWidth * kHeight * 4);
+	Display() : vertices{sf::Quads, kWidth * kHeight * 4} {}
 
+	void set_display(const std::bitset<kWidth*kHeight>& display) {
 		for(int y = 0; y < kHeight; ++y) {
 			for(int x = 0; x < kWidth; ++x) {
 				int pixel = display[x + y * kWidth];
