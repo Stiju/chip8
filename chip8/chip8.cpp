@@ -3,8 +3,6 @@
 #include <random>
 #include <fstream>
 
-#include <Windows.h>
-
 const uint8_t kFontData[] = {
 	0xF0, 0x90, 0x90, 0x90, 0xF0,
 	0x20, 0x60, 0x20, 0x20, 0x70,
@@ -99,8 +97,6 @@ void Chip8::execute_instruction() {
 	case 0xD:
 	{
 		VF = 0;
-		static std::bitset<kWidth*kHeight> changed;
-		changed.reset();
 		for(uint16_t y = 0; y < op.data.n; ++y) {
 			uint8_t sprite = memory[header.I + y];
 			for(uint16_t x = 0; x < 8; ++x) {
@@ -110,18 +106,6 @@ void Chip8::execute_instruction() {
 						VF = 1;
 					}
 					header.display[i] = header.display[i] ^ 1;
-					changed[i] = changed[i] ^ 1;
-				}
-			}
-		}
-
-		static HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
-		SetConsoleCursorPosition(hStdout, {0,0});
-		for(short y = 0; y < kHeight; ++y) {
-			for(short x = 0; x < kWidth; ++x) {
-				if(changed[x + y*kWidth]) {
-					SetConsoleCursorPosition(hStdout, {x,y});
-					printf("%c", header.display[x + y *kWidth] ? '#' : ' ');
 				}
 			}
 		}

@@ -41,7 +41,6 @@ private:
 };
 
 int main(int argc, char *argv[]) try {
-	system("cls");
 	if(argc < 2) {
 		return 0;
 	}
