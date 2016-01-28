@@ -95,7 +95,6 @@ void Chip8::execute_instruction() {
 		Vx = random() & op.nn;
 		break;
 	case 0xD:
-	{
 		VF = 0;
 		for(uint16_t y = 0; y < op.data.n; ++y) {
 			uint8_t sprite = memory[header.I + y];
@@ -110,8 +109,7 @@ void Chip8::execute_instruction() {
 			}
 		}
 		header.display_updated = true;
-	}
-	break;
+		break;
 	case 0xE:
 		switch(op.nn) {
 		case 0x9E: if(header.keys[Vx] != 0) header.pc += 2; break;
@@ -122,7 +120,20 @@ void Chip8::execute_instruction() {
 	case 0xF:
 		switch(op.nn) {
 		case 0x07: Vx = header.delay_timer; break;
-		case 0x0A: break;
+		case 0x0A: {
+			bool key_pressed = false;
+			for(uint8_t i = 0; i < 16; ++i) {
+				if(header.keys[i] != 0) {
+					Vx = i;
+					key_pressed = true;
+					break;
+				}
+			}
+			if(!key_pressed) {
+				header.pc -= 2;
+				return;
+			}
+		} break;
 		case 0x15: header.delay_timer = Vx; break;
 		case 0x18: header.sound_timer = Vx; break;
 		case 0x1E: header.I += Vx; break;

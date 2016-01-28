@@ -1,3 +1,5 @@
+#include <chrono>
+#include <thread>
 #include <SFML/Graphics.hpp>
 #include "chip8.h"
 
@@ -48,23 +50,44 @@ int main(int argc, char *argv[]) try {
 
 	Display display;
 
+	using k = sf::Keyboard;
+	const int keymap[16]{
+		k::X,k::Num1,k::Num1,k::Num1,
+		k::Q,k::W,k::E,k::A,k::S,k::D,
+		k::Z,k::C,k::Num4,k::R,k::F,k::V
+	};
+
 	sf::RenderWindow window{sf::VideoMode{kWindowWidth, kWindowHeight}, "Chip-8"};
-	window.setFramerateLimit(60);
 
 	while(window.isOpen()) {
 		sf::Event event;
 		while(window.pollEvent(event)) {
 			if(event.type == sf::Event::Closed) {
 				window.close();
+			} else if(event.type == sf::Event::KeyPressed ||
+				event.type == sf::Event::KeyReleased) {
+				for(int i = 0; i < 16; ++i) {
+					if(event.key.code == keymap[i]) {
+						chip8.set_key(i, event.type == sf::Event::KeyPressed);
+						break;
+					}
+				}
 			}
 		}
-		chip8.execute_instruction();
-		if(chip8.display_updated()) {
+		bool display_updated = false;
+		for(int i = 0; i < 60 && !display_updated; ++i) {
+			chip8.execute_instruction();
+			display_updated = chip8.display_updated();
+		}
+		int sleep = 1;
+		if(display_updated) {
 			display.set_display(chip8.get_display());
+			sleep = 16;
 		}
 		window.clear();
 		window.draw(display);
 		window.display();
+		std::this_thread::sleep_for(std::chrono::milliseconds(sleep));
 	}
 } catch(const exception::file_not_found &) {
 	printf("file not found\n");

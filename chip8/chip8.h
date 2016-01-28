@@ -45,6 +45,7 @@ public:
 		header.display_updated = false;
 		return true;
 	}
+	void set_key(int index, uint8_t value) { header.keys[index] = value; }
 };
 
 namespace exception {
