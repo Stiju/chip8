@@ -27,7 +27,7 @@ class Chip8 {
 	union {
 		uint8_t memory[4096];
 		struct {
-			uint8_t V[16], keys[16], delayTimer, soundTimer, fontData[16*5];
+			uint8_t V[16], keys[16], delayTimer, soundTimer, fontData[16 * 5], display_updated;
 			uint16_t I, stack[16], sp, pc;
 			std::bitset<kWidth*kHeight> display;
 		} header;
@@ -39,6 +39,12 @@ public:
 	void execute_instruction();
 	void init();
 	void load(const char *name);
+	const auto& get_display() const { return header.display; }
+	bool display_updated() {
+		if(!header.display_updated) return false;
+		header.display_updated = false;
+		return true;
+	}
 };
 
 namespace exception {

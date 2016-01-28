@@ -2,12 +2,8 @@
 
 #include <random>
 #include <fstream>
-#include <chrono>
-#include <thread>
 
 #include <Windows.h>
-
-using namespace std::chrono_literals;
 
 const uint8_t kFontData[] = {
 	0xF0, 0x90, 0x90, 0x90, 0xF0,
@@ -44,8 +40,6 @@ void Chip8::execute_instruction() {
 	Opcode op = memory[header.pc] << 8 | memory[header.pc + 1];
 	header.pc += 2;
 	uint8_t &Vx = header.V[op.data.x], &Vy = header.V[op.data.y], &V0 = header.V[0], &VF = header.V[0xF];
-	//printf("%#06x\n", op.opcode);
-	bool drawn = false;
 	switch(op.data.code) {
 	case 0x0:
 		switch(op.opcode) {
@@ -131,7 +125,7 @@ void Chip8::execute_instruction() {
 				}
 			}
 		}
-		drawn = true;
+		header.display_updated = true;
 	}
 	break;
 	case 0xE:
@@ -148,7 +142,7 @@ void Chip8::execute_instruction() {
 		case 0x15: header.delayTimer = Vx; break;
 		case 0x18: header.soundTimer = Vx; break;
 		case 0x1E: header.I += Vx; break;
-		case 0x29: header.I = (header.fontData - memory) + Vx * 5; break;
+		case 0x29: header.I = static_cast<uint16_t>(header.fontData - memory) + Vx * 5; break;
 		case 0x33:
 			memory[header.I] = Vx;
 			memory[header.I + 1] = (Vx / 10) % 10;
@@ -161,7 +155,6 @@ void Chip8::execute_instruction() {
 		break;
 	default: throw exception::unknown_opcode{op};
 	}
-	if(drawn || header.delayTimer > 0 || header.soundTimer > 0) std::this_thread::sleep_for(16ms);
 	if(header.delayTimer > 0) header.delayTimer--;
 	if(header.soundTimer > 0) header.soundTimer--;
 }
@@ -170,6 +163,7 @@ void Chip8::init() {
 	memset(memory, 0, sizeof(memory));
 	header.pc = kEntryPoint;
 	memcpy(header.fontData, kFontData, sizeof(kFontData));
+	header.display_updated = true;
 }
 
 void Chip8::load(const char *name) {
