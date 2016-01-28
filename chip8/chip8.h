@@ -27,7 +27,7 @@ class Chip8 {
 	union {
 		uint8_t memory[4096];
 		struct {
-			uint8_t V[16], keys[16], delayTimer, soundTimer, fontData[16 * 5], display_updated;
+			uint8_t V[16], keys[16], delay_timer, sound_timer, font_data[16 * 5], display_updated;
 			uint16_t I, stack[16], sp, pc;
 			std::bitset<kWidth*kHeight> display;
 		} header;

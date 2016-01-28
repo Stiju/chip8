@@ -121,12 +121,12 @@ void Chip8::execute_instruction() {
 		break;
 	case 0xF:
 		switch(op.nn) {
-		case 0x07: Vx = header.delayTimer; break;
+		case 0x07: Vx = header.delay_timer; break;
 		case 0x0A: break;
-		case 0x15: header.delayTimer = Vx; break;
-		case 0x18: header.soundTimer = Vx; break;
+		case 0x15: header.delay_timer = Vx; break;
+		case 0x18: header.sound_timer = Vx; break;
 		case 0x1E: header.I += Vx; break;
-		case 0x29: header.I = static_cast<uint16_t>(header.fontData - memory) + Vx * 5; break;
+		case 0x29: header.I = static_cast<uint16_t>(header.font_data - memory) + Vx * 5; break;
 		case 0x33:
 			memory[header.I] = Vx / 100;
 			memory[header.I + 1] = (Vx / 10) % 10;
@@ -139,14 +139,14 @@ void Chip8::execute_instruction() {
 		break;
 	default: throw exception::unknown_opcode{op};
 	}
-	if(header.delayTimer > 0) header.delayTimer--;
-	if(header.soundTimer > 0) header.soundTimer--;
+	if(header.delay_timer > 0) header.delay_timer--;
+	if(header.sound_timer > 0) header.sound_timer--;
 }
 
 void Chip8::init() {
 	memset(memory, 0, sizeof(memory));
 	header.pc = kEntryPoint;
-	memcpy(header.fontData, kFontData, sizeof(kFontData));
+	memcpy(header.font_data, kFontData, sizeof(kFontData));
 	header.display_updated = true;
 }
 
