@@ -144,7 +144,7 @@ void Chip8::execute_instruction() {
 		case 0x1E: header.I += Vx; break;
 		case 0x29: header.I = static_cast<uint16_t>(header.fontData - memory) + Vx * 5; break;
 		case 0x33:
-			memory[header.I] = Vx;
+			memory[header.I] = Vx / 100;
 			memory[header.I + 1] = (Vx / 10) % 10;
 			memory[header.I + 2] = Vx % 10;
 			break;
