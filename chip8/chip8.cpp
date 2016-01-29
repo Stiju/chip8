@@ -75,9 +75,9 @@ void Chip8::execute_instruction() {
 		case 0x2: Vx &= Vy; break;
 		case 0x3: Vx ^= Vy; break;
 		case 0x4: Vx += Vy; VF = Vy > Vx; break;
-		case 0x5: VF = Vy > Vx; Vx -= Vy; break;
+		case 0x5: VF = Vy <= Vx; Vx -= Vy; break;
 		case 0x6: VF = Vx & 1; Vx >>= 1; break;
-		case 0x7: VF = Vx > Vy; Vx = Vy - Vx; break;
+		case 0x7: VF = Vx <= Vy; Vx = Vy - Vx; break;
 		case 0xe: VF = Vx >> 7; Vx <<= 1; break;
 		default: throw exception::unknown_opcode{op};
 		}
@@ -100,7 +100,7 @@ void Chip8::execute_instruction() {
 			uint8_t sprite = memory[header.I + y];
 			for(uint16_t x = 0; x < 8; ++x) {
 				if(sprite & (0x80 >> x)) {
-					uint16_t i = Vx + x + (Vy + y) * kWidth;
+					uint16_t i = ((Vx + x) % kWidth) + ((Vy + y) % kHeight) * kWidth;
 					if(header.display[i] == 1) {
 						VF = 1;
 					}
